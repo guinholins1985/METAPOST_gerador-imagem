@@ -3,7 +3,7 @@ import { ImageUploader } from './components/ImageUploader';
 import { GeneratedImageCard } from './components/GeneratedImageCard';
 import { ImageModal } from './components/ImageModal';
 import { ApiKeyModal } from './components/ApiKeyModal';
-import { MegapostLogoIcon } from './components/icons';
+import { MegapostLogoIcon, DownloadIcon } from './components/icons';
 import { generateImage } from './services/geminiService';
 import { ImageCategory, GeneratedImages, LoadingStates } from './types';
 
@@ -68,6 +68,7 @@ const App: React.FC = () => {
   };
   
   const isGenerating = Object.values(loadingStates).some(Boolean);
+  const hasGeneratedImages = Object.values(generatedImages).some(img => img !== null);
 
   const triggerGeneration = useCallback(async (category: ImageCategory, file: File, onComplete: () => void) => {
     setLoadingStates(prev => ({ ...prev, [category]: true }));
@@ -76,8 +77,13 @@ const App: React.FC = () => {
     try {
       const imageUrl = await generateImage(file, category);
       setGeneratedImages(prev => ({ ...prev, [category]: imageUrl }));
-    } catch (e: any) {
-      setErrorStates(prev => ({ ...prev, [category]: e.message || 'Ocorreu um erro desconhecido' }));
+    } catch (e) {
+      // FIX: Type 'unknown' is not assignable to type 'string'. The catch clause variable `e` is of type `unknown` and must be type-checked before use.
+      if (e instanceof Error) {
+        setErrorStates(prev => ({ ...prev, [category]: e.message || 'Ocorreu um erro desconhecido' }));
+      } else {
+        setErrorStates(prev => ({ ...prev, [category]: 'Ocorreu um erro desconhecido' }));
+      }
     } finally {
       setLoadingStates(prev => ({ ...prev, [category]: false }));
       onComplete();
@@ -116,6 +122,30 @@ const App: React.FC = () => {
       triggerGeneration(category, selectedFile, onComplete);
     }
   };
+  
+  const handleDownloadAll = () => {
+    const titleMap: Record<string, string> = {
+      lifestyle: 'Lifestyle',
+      product: 'Mockup do Produto',
+      angled_product: 'Mockup com Ângulo',
+      model: 'Com Modelo',
+      gif: 'Cena Dinâmica (Estilo GIF)',
+      story: 'Story (Insta e Whats)',
+      transparent_bg: 'Sem Fundo (PNG)',
+    };
+
+    Object.entries(generatedImages).forEach(([category, imageUrl]) => {
+      if (imageUrl) {
+        const link = document.createElement('a');
+        link.href = imageUrl;
+        const fileName = titleMap[category as ImageCategory] || category;
+        link.download = `megapost_${fileName.replace(/\s+/g, '_')}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    });
+  };
 
   const categories: ImageCategory[] = ['lifestyle', 'product', 'angled_product', 'model', 'gif', 'story', 'transparent_bg'];
 
@@ -150,7 +180,7 @@ const App: React.FC = () => {
                 onClick={handleGenerateClick}
                 className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 font-bold text-white bg-violet-600 rounded-lg hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 disabled:bg-slate-400 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-lg shadow-violet-500/30"
               >
-                Gerar Imagens
+                Carregar Imagens
               </button>
             </div>
           )}
@@ -168,9 +198,20 @@ const App: React.FC = () => {
           </div>
         )}
         
-        {(isGenerating || Object.values(generatedImages).some(img => img !== null)) && (
+        {(isGenerating || hasGeneratedImages) && (
           <div className="mt-12 md:mt-20">
-            <h2 className="text-3xl font-bold text-slate-900 text-center mb-10">Resultados Gerados</h2>
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-10 text-center">
+                <h2 className="text-3xl font-bold text-slate-900">Resultados Gerados</h2>
+                {hasGeneratedImages && !isGenerating && (
+                    <button
+                        onClick={handleDownloadAll}
+                        className="inline-flex items-center justify-center px-5 py-2 font-semibold text-white bg-violet-600 rounded-lg hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-violet-500/30"
+                    >
+                        <DownloadIcon className="w-5 h-5 mr-2" />
+                        Baixar Todas
+                    </button>
+                )}
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {categories.map((cat) => (
                 <GeneratedImageCard
