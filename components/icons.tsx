@@ -7,21 +7,23 @@ export const UploadIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 );
 
 export const MegapostLogoIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-  <svg {...props} viewBox="0 0 240 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-    <text 
-      x="50%" 
-      y="50%"
-      dominantBaseline="central"
-      textAnchor="middle"
-      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif"
-      fontSize="32" 
-      fontWeight="800" 
-      fill="currentColor"
-      letterSpacing="-1"
-    >
-      MEGAPOST
-    </text>
-  </svg>
+    <svg {...props} viewBox="0 0 245 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <g fill="currentColor">
+            <path d="M22.0625 14.3125L23.5 10.5L24.9375 14.3125L28.75 15.75L24.9375 17.1875L23.5 21L22.0625 17.1875L18.25 15.75L22.0625 14.3125Z" />
+            <path d="M11.25 8L12.5 4L13.75 8L17.5 9.25L13.75 10.5L12.5 14.25L11.25 10.5L7.5 9.25L11.25 8Z" />
+        </g>
+        <text
+            x="40"
+            y="32"
+            fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif"
+            fontSize="32"
+            fontWeight="800"
+            fill="currentColor"
+            letterSpacing="-1"
+        >
+            MEGAPOST
+        </text>
+    </svg>
 );
 
 export const DownloadIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (

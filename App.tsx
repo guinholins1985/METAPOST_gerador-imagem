@@ -78,7 +78,7 @@ const App: React.FC = () => {
       const imageUrl = await generateImage(file, category);
       setGeneratedImages(prev => ({ ...prev, [category]: imageUrl }));
     } catch (e) {
-      // FIX: Type 'unknown' is not assignable to type 'string'. The catch clause variable `e` is of type `unknown` and must be type-checked before use.
+      // Fix: Type 'unknown' is not assignable to type 'string'. The catch clause variable `e` is of type `unknown` and must be type-checked before use.
       if (e instanceof Error) {
         setErrorStates(prev => ({ ...prev, [category]: e.message || 'Ocorreu um erro desconhecido' }));
       } else {
@@ -150,21 +150,23 @@ const App: React.FC = () => {
   const categories: ImageCategory[] = ['lifestyle', 'product', 'angled_product', 'model', 'gif', 'story', 'transparent_bg'];
 
   return (
-    <div className="bg-gradient-to-br from-slate-50 to-violet-100 min-h-full font-sans text-slate-900">
+    <div className="bg-slate-50 min-h-full font-sans text-slate-900">
       <ApiKeyModal isOpen={isApiKeyModalOpen} onClose={() => setIsApiKeyModalOpen(false)} />
       <ImageModal imageUrl={zoomedImageUrl} onClose={() => setZoomedImageUrl(null)} />
 
-      <header className="py-6">
+      <header className="py-4 bg-white border-b border-slate-200">
         <div className="container mx-auto px-4 flex items-center justify-center">
-            <MegapostLogoIcon className="h-10 w-auto text-slate-900" />
+            <MegapostLogoIcon className="h-8 w-auto text-violet-600" />
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 mb-4">Gerador de Imagens para E-commerce</h1>
-          <p className="text-base sm:text-lg text-slate-600">
-            Envie a foto do seu produto e crie instantaneamente imagens profissionais com Inteligência Artificial.
+          <h1 className="text-5xl sm:text-6xl font-extrabold text-slate-900 mb-4 leading-tight max-w-3xl mx-auto">
+            Crie Conteúdo de <span className="text-violet-600">Marketing em Segundos</span>
+          </h1>
+          <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+            Faça upload de uma imagem ou cole um link de produto. Nossa IA analisará e gerará textos de alta conversão para todas as suas necessidades.
           </p>
         </div>
 
