@@ -1,8 +1,8 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { ImageUploader } from './components/ImageUploader';
 import { GeneratedImageCard } from './components/GeneratedImageCard';
 import { ImageModal } from './components/ImageModal';
-import { ApiKeyModal } from './components/ApiKeyModal';
 import { MegapostLogoIcon, DownloadIcon } from './components/icons';
 import { generateImage } from './services/geminiService';
 import { ImageCategory, GeneratedImages, LoadingStates } from './types';
@@ -38,14 +38,7 @@ const App: React.FC = () => {
     transparent_bg: null,
   });
   const [zoomedImageUrl, setZoomedImageUrl] = useState<string | null>(null);
-  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
   const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    if (!process.env.API_KEY) {
-      setIsApiKeyModalOpen(true);
-    }
-  }, []);
 
   const handleImageSelect = (file: File | null) => {
     if (previewUrl) {
@@ -54,7 +47,6 @@ const App: React.FC = () => {
     
     setSelectedFile(file);
     
-    // Reset states when a new image is selected or cleared
     setGeneratedImages({ lifestyle: null, product: null, model: null, gif: null, angled_product: null, story: null, transparent_bg: null });
     setErrorStates({ lifestyle: null, product: null, model: null, gif: null, angled_product: null, story: null, transparent_bg: null });
     setProgress(0);
@@ -78,12 +70,14 @@ const App: React.FC = () => {
       const imageUrl = await generateImage(file, category);
       setGeneratedImages(prev => ({ ...prev, [category]: imageUrl }));
     } catch (e) {
-      // Fix: Type 'unknown' is not assignable to type 'string'. The catch clause variable `e` is of type `unknown` and must be type-checked before use.
+      // FIX: Handle 'unknown' type from catch block gracefully.
+      let errorMessage = 'Ocorreu um erro desconhecido';
       if (e instanceof Error) {
-        setErrorStates(prev => ({ ...prev, [category]: e.message || 'Ocorreu um erro desconhecido' }));
-      } else {
-        setErrorStates(prev => ({ ...prev, [category]: 'Ocorreu um erro desconhecido' }));
+        errorMessage = e.message;
+      } else if (typeof e === 'string') {
+        errorMessage = e;
       }
+      setErrorStates(prev => ({ ...prev, [category]: errorMessage }));
     } finally {
       setLoadingStates(prev => ({ ...prev, [category]: false }));
       onComplete();
@@ -151,7 +145,6 @@ const App: React.FC = () => {
 
   return (
     <div className="bg-slate-50 min-h-full font-sans text-slate-900">
-      <ApiKeyModal isOpen={isApiKeyModalOpen} onClose={() => setIsApiKeyModalOpen(false)} />
       <ImageModal imageUrl={zoomedImageUrl} onClose={() => setZoomedImageUrl(null)} />
 
       <header className="py-4 bg-white border-b border-slate-200">

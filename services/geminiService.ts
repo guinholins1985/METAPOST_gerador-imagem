@@ -1,9 +1,6 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 import { ImageCategory } from '../types';
 
-// Per guidelines, initialize with API_KEY from environment variables.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
-
 const getMimeType = (fileName: string): string | null => {
   const extension = fileName.split('.').pop()?.toLowerCase();
   switch (extension) {
@@ -68,9 +65,10 @@ const getPromptForCategory = (category: ImageCategory): string => {
 
 export const generateImage = async (imageFile: File, category: ImageCategory): Promise<string> => {
   if (!process.env.API_KEY) {
-    throw new Error("API_KEY environment variable not set.");
+    throw new Error("A variável de ambiente API_KEY não está configurada.");
   }
   
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const imagePart = await fileToGenerativePart(imageFile);
   
   // For GIF inputs, we add a specific instruction for the model.
